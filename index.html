@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="web-app">
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <meta http-equiv="pragma" content="no-cache" />
+	    <link rel="shortcut icon" href="" type="image/png">
+	    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	    
+	    <title>Gutenberg Project</title>
+	    <base href="/">
+   		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+	    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Gudea">
+	    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+	    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	 <!--  	<link href="/css/materialize-style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+		<link rel="stylesheet" type="text/css" href="/css/sweet-alert/sweetalert.css"> -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>	
+	</head>
+	<body>
+		
+		<style>
+			body{
+				background:#6257f5;
+			}
+			
+			.heading{
+				margin: 50px auto 70px auto;
+				width: 30%;
+				color: white;
+				font-family: sans-serif;
+				font-size:3em;
+				line-height:1.2em;
+			}
+		
+			.list{
+				height:60px;
+				background-color:#443aca;
+				padding:15px 0 0 25px;
+				margin-bottom:10px;
+				font-size:1.5em;
+				cursor:pointer;
+				color:white;
+			}
+			
+			.list:hover{
+				box-shadow: 0 0 15px rgba(0,0,0,1);
+			}
+			
+			.text{
+				float:left;
+			}
+			
+			.arrow{
+				float:right;
+				margin-right:10px;
+			}
+			
+			@media only screen and (max-width: 768px){
+				.heading{
+					width: 7em;
+				}
+			}
+		
+			html{
+				font-family:"franklin-gothic-urw",sans-serif !important;
+			}
+
+			.container{
+				top:60px;
+				position:relative;
+			/*	left:50px !important;*/
+				margin:0px 0px 10px 10px;
+			}
+			
+		</style>
+		<script>
+			var app = angular.module('web-app', []);
+			
+			app.controller('InfoController', ['$scope','$window','$http',function($scope,$window,$http) {
+
+				$scope.books={};
+				$scope.genre=["Fiction", "Drama","Humor","Politics","Philosphy","History","Adventure"];
+
+				$scope.getBooks = function(genre){
+					$window.location.href="E:/Ignite/allBooks.html?"+$scope.genre[genre];
+				}
+					
+			}]);
+			
+			
+		</script>
+	
+		<div class="row col s12 m12 l12" ng-controller="InfoController">
+			<div class="row col s12 m10 l10  offset-m1 offset-l1 z-depth-1 container">
+				<h4 class="heading" align="center">Gutenberg Project</h4>
+				<ul class="GenreList" id="GenreList">
+					<li class="list" id="Fiction" ng-click="getBooks(0)"><span class="text">FICTION</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+					<li class="list" ng-click="getBooks(1)"><span class="text">DRAMA</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+					<li class="list" ng-click="getBooks(2)"><span class="text">HUMOR</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+					<li class="list" ng-click="getBooks(3)"><span class="text">POLITICS</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+					<li class="list" ng-click="getBooks(4)"><span class="text">PHILOSPHY</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+					<li class="list" ng-click="getBooks(5)"><span class="text">HISTORY</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+					<li class="list" ng-click="getBooks(6)"><span class="text">ADVENTURE</span>
+						<span class="arrow"><a><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_right_arrow.png" style="height: 40px;"></a></span></li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="web-app">
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+	    <meta http-equiv="pragma" content="no-cache" />
+	    <link rel="shortcut icon" href="" type="image/png">
+	    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	    
+	    <title>Gutenberg Project</title>
+	    <base href="/">
+   		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+	    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Gudea">
+	    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+	    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	 <!--  	<link href="/css/materialize-style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+		<link rel="stylesheet" type="text/css" href="/css/sweet-alert/sweetalert.css"> -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>	
+	</head>
+	<body>
+		<style>
+			
+			.heading{
+				margin: 0 auto 30px auto;
+				font-family: sans-serif;
+				line-height:1.2em;
+				text-transform: uppercase;
+			}
+		
+			.list{
+				height:60px;
+				background-color:#443aca;
+				padding:15px 0 0 25px;
+				margin-bottom:10px;
+				font-size:1.5em;
+				cursor:pointer;
+				color:white;
+			}
+			
+			#topbarsearch{
+				float:left;
+				width:71%;
+			}
+			
+			.arrow{
+				float:left;
+				margin-top:10px;
+			}
+		
+			html{
+				font-family:"franklin-gothic-urw",sans-serif !important;
+			}
+
+			.container{
+				position:relative;
+			/*	left:50px !important;*/
+				margin:10px 0px 0px 10px;
+			}
+			
+			.nav-wrapper{
+				background-color:#5750ac;
+			}
+			
+			#autocomplete-input{
+				border-bottom:1px solid white;
+			}
+			
+			.card{
+				cursor:pointer;
+			}
+			
+			.card:hover{
+				box-shadow: 0 0 15px rgba(0,0,0,1);
+			}
+			
+			.card .card-image img{
+				height:300px;
+				border-radius: 15px;
+				border: 1px solid black;
+			}
+			
+			@media only screen and (max-width: 1000px){
+				.card .card-image img{
+					height:250px !important;
+				}
+			}
+			
+			@media only screen and (max-width: 500px){
+				.card .card-image img{
+					height:150px !important;
+				}
+			}
+			
+			.card .card-content{
+				height:120px;
+			}
+			
+			.card-content h6{
+				font-weight:700;
+				font-size:16px;
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				-webkit-box-orient: vertical; 
+				overflow:hidden;
+			}
+			
+			.card-content p{
+				text-overflow:ellipsis;
+				overflow:hidden;
+				white-space: nowrap;
+			}
+		
+			#loader{
+				margin-left:auto;
+				margin-right:auto;
+			}
+			
+			#scroll-to{
+				visibility:hidden;
+			}	
+			
+			nav{
+				position: fixed;
+				z-index: 100;
+				margin-top: -8px;
+			}
+			
+			#content{
+				margin-top:100px;
+			}
+		</style>
+		<script>
+			var app = angular.module('web-app', []);
+			
+			app.controller('booksController', ['$scope','$window','$http',function($scope,$window,$http) {
+				
+				
+				/************************* Intialising variables    ***************/
+				$scope.param=window.location.href.split('?')[1].toLowerCase();
+				$scope.books=[];
+				$scope.pageNo=1;
+				$scope.pageSearchNo=1;
+				document.getElementById('loader').style.display = 'block';
+				$scope.serachString='';
+				$scope.formats=['htm','pdf','txt'];
+				$scope.matched=false;
+				
+				/*************************    Function to get books in selected genre   ***************/
+				$scope.getBooks = function(param){							
+					$http.get('http://skunkworks.ignitesol.com:8000/books/?mime_type=image&topic='+$scope.param+'&'+param).then(function(response, status, headers, config) {
+						console.log(response.data.results);
+						if(response.data.results.length>0){
+							for(i=0;i<response.data.results.length;i++){
+								$scope.books.push(response.data.results[i]);
+							}
+							document.getElementById('loader').style.display = 'none';
+							if($scope.books.length<5){
+								$scope.pageNo+=1;
+								$scope.page='page='+$scope.pageNo;
+								if($scope.pageNo>0){
+									$scope.getBooks($scope.page);
+								}
+							}
+							if(response.data.results.length==32){
+								$scope.pageNo+=1;
+							}
+							else{
+								$scope.pageNo=1;
+							}
+						}
+						else{
+							document.getElementById('loader').style.display = 'none';
+							$scope.errorMsg="There are no Books in this genre";
+						}
+					}, 
+					function(data, status, headers, config) {
+						console.log(data.data);
+						document.getElementById('loader').style.display = 'none';
+						$scope.errorMsg="There are no Books in this genre";
+					});
+				}
+				
+				$scope.getBooks('');
+				
+				
+				/************************* function to call books on next page   when user scrolls down ***************/
+				$(window).scroll(function() {
+				   var hT = $('#scroll-to').offset().top,
+					   hH = $('#scroll-to').outerHeight(),
+					   wH = $(window).height(),
+					   wS = $(this).scrollTop();
+				   if (wS > (hT+hH-wH)){
+						console.log('scrolling');
+						$scope.page='page='+$scope.pageNo;
+						if($scope.pageNo>1 && $scope.serachString==''){
+							$scope.getBooks($scope.page);
+						}
+						else if($scope.serachString!=''){
+							$scope.pageSearchNo+=1;
+							$scope.getFilter($scope.serachString);
+						}
+				   }
+				});		
+				
+		
+				/************************* Function to get books related to user's search    ***************/
+				$scope.getFilter = function(search){
+					console.log(search);
+					$scope.books=[];
+					$scope.serachString=search;
+					$scope.page='page='+$scope.pageSearchNo;
+					document.getElementById('loader').style.display = 'block';
+					$http.get('http://skunkworks.ignitesol.com:8000/books/?mime_type=image&topic='+$scope.param+'&search='+search+'&'+$scope.page).then(function(response, status, headers, config) {
+						console.log(response.data.results);
+						if(response.data.results.length>0){
+							for(i=0;i<response.data.results.length;i++){
+								$scope.books.push(response.data.results[i]);
+							}
+							$scope.errorMsg='';
+							document.getElementById('loader').style.display = 'none';
+					
+							if(response.data.results.length<32){
+								$scope.pageSearchNo=1;
+							}
+						}
+						else{
+							document.getElementById('loader').style.display = 'none';
+							$scope.errorMsg="There are no Books in this genre";
+						}
+					}, 
+					function(data, status, headers, config) {
+						console.log(data.data);
+						document.getElementById('loader').style.display = 'none';
+						$scope.errorMsg="There are no Books in this genre";
+					});
+				}
+				
+				/************************* Function to clear search text   ***************/
+				$scope.clearSearch = function(){
+					$scope.serachString='';
+					$scope.search='';
+					$scope.pageSearchNo=1;
+					$scope.getBooks('');
+				}
+				
+				/************************* Function to open book in new tab   ***************/
+				$scope.openBook = function(book) {
+					for(var key in book.formats){
+						for(j=0;j<$scope.formats.length;j++){
+							if(RegExp($scope.formats[j]+"$").test(book.formats[key]) || RegExp(".utf-8$").test(book.formats[key])) {
+								if(j<2 ||(j==2 && (key=="text/plain" || key=="text/plain; charset=utf-8"))){
+									console.log(book.formats[key]);
+									window.open(book.formats[key], '_blank');
+									window.reload();
+									$scope.matched=true;
+									break;
+								}
+							}
+						}
+						if($scope.matched){
+							break;
+						}
+					}
+					if(!$scope.matched){
+						var $toastContent = $('<h5>No viewable version available</h5>');
+						Materialize.toast($toastContent, 10000, 'rounded');
+					}
+				};
+				
+			
+			}]);
+					
+			
+		</script>
+	
+		<div class="row col s12 m12 l12" id="myDiv" ng-controller="booksController">
+			<nav>
+				<div class="nav-wrapper">
+					<div class="center row">
+						  <div class="col s12 m8 l6" style="padding:0;">
+							<div class="col s12 m12 l12" >
+								<span class="arrow"><a href="E:/Ignite/index.html"><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_left_arrow.png" style="height: 40px;"></a></span>
+								<div class="row" id="topbarsearch">
+								  <div class="input-field col s12 m12 l12">
+										<input type="text" placeholder="search" id="autocomplete-input" class="autocomplete" ng-model="search" ng-change="getFilter(search)"><i class="white-text material-icons prefix" style="left:0;top:0;">search</i></input>
+									</div>
+								</div>
+								<span class="arrow" style="margin-left:15px"><a href="" ng-click="clearSearch()"><img src="https://raw.githubusercontent.com/shreshtha02/Ignitesol/master/ic_close.png" style="height: 30px;margin-left: -5px;"></a></span>
+							</div>
+						</div>
+					</div>    
+				</div>
+			</nav>
+			<div class="row col s12 m12 l12" id="content">
+				<h5 class="heading">{{param}}</h5>
+				<div>
+					<div class="preloader-wrapper big active" id="loader">
+						<div class="spinner-layer spinner-blue">
+							<div class="circle-clipper left">
+							  <div class="circle"></div>
+							</div><div class="gap-patch">
+							  <div class="circle"></div>
+							</div><div class="circle-clipper right">
+							  <div class="circle"></div>
+							</div>
+						</div>
+
+						<div class="spinner-layer spinner-red">
+							<div class="circle-clipper left">
+							  <div class="circle"></div>
+							</div><div class="gap-patch">
+							  <div class="circle"></div>
+							</div><div class="circle-clipper right">
+							  <div class="circle"></div>
+							</div>
+						</div>
+
+						<div class="spinner-layer spinner-yellow">
+							<div class="circle-clipper left">
+							  <div class="circle"></div>
+							</div><div class="gap-patch">
+							  <div class="circle"></div>
+							</div><div class="circle-clipper right">
+							  <div class="circle"></div>
+							</div>
+						</div>
+
+					  <div class="spinner-layer spinner-green">
+						<div class="circle-clipper left">
+						  <div class="circle"></div>
+						</div><div class="gap-patch">
+						  <div class="circle"></div>
+						</div><div class="circle-clipper right">
+						  <div class="circle"></div>
+						</div>
+						</div>
+					</div>
+					<h5 align="center">{{errorMsg}}</h5>
+        
+					<div class="row col s6 m4 l3" ng-repeat="book in books">
+						<div class="card" ng-click="openBook(book)">
+							<div class="card-image">
+								<img src={{book.formats["image/jpeg"]}}>
+							</div>
+							<div class="card-content">
+								<h6>{{book.title}}</h6>
+								<p>{{book.authors[0].name}}</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<h6 id="scroll-to">Page Count.</h6>
+		</div>
+	</body>
+</html>
