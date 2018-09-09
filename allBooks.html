@@ -197,7 +197,7 @@
 						if($scope.pageNo>1 && $scope.serachString==''){
 							$scope.getBooks($scope.page);
 						}
-						else if($scope.serachString!=''){
+						else if($scope.serachString!='' && $scope.next!=null){
 							$scope.pageSearchNo+=1;
 							$scope.getFilter($scope.serachString);
 						}
@@ -208,7 +208,9 @@
 				/************************* Function to get books related to user's search    ***************/
 				$scope.getFilter = function(search){
 					console.log(search);
-					$scope.books=[];
+					if($scope.pageSearchNo==1){
+						$scope.books=[];
+					}
 					$scope.serachString=search;
 					$scope.page='page='+$scope.pageSearchNo;
 					document.getElementById('loader').style.display = 'block';
@@ -223,6 +225,7 @@
 					
 							if(response.data.results.length<32){
 								$scope.pageSearchNo=1;
+								$scope.next=null;
 							}
 						}
 						else{
@@ -242,6 +245,8 @@
 					$scope.serachString='';
 					$scope.search='';
 					$scope.pageSearchNo=1;
+					$scope.books=[];
+					document.getElementById('loader').style.display = 'block';
 					$scope.getBooks('');
 				}
 				
